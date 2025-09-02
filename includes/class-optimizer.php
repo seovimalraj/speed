@@ -75,6 +75,11 @@ class Speed_Optimizer_Optimizer {
      * Initialize WordPress hooks
      */
     private function init_hooks() {
+        // Check for safe mode - if enabled, skip all optimizations
+        if (get_option('speed_optimizer_safe_mode', 0)) {
+            return;
+        }
+        
         // Page caching
         if ($this->options['enable_page_caching'] && $this->license->is_feature_available('page_caching')) {
             add_action('init', array($this, 'setup_page_caching'));
@@ -350,8 +355,22 @@ class Speed_Optimizer_Optimizer {
         }
         
         $expiration = $this->options['cache_expiration'];
+        
+        // Standard cache headers
         header('Cache-Control: public, max-age=' . $expiration);
         header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $expiration) . ' GMT');
+        
+        // Cloudflare specific headers
+        if (get_option('speed_optimizer_cloudflare_integration', 0)) {
+            header('CF-Cache-Status: DYNAMIC');
+            header('CF-RAY: ' . uniqid());
+        }
+        
+        // Varnish specific headers
+        if (get_option('speed_optimizer_varnish_cache', 0)) {
+            header('X-Varnish-TTL: ' . $expiration);
+            header('X-Varnish-Cache: MISS');
+        }
     }
     
     /**
@@ -575,6 +594,12 @@ class Speed_Optimizer_Optimizer {
         
         // Add cache header
         header('X-Cache: MISS');
+        
+        // Add debug information if enabled
+        if (get_option('speed_optimizer_debug_mode', 0)) {
+            $buffer .= "\n<!-- Speed Optimizer Debug: Page cached at " . date('Y-m-d H:i:s') . " -->";
+            $buffer .= "\n<!-- Cache key: $cache_key -->";
+        }
         
         return $buffer;
     }

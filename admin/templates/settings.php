@@ -682,8 +682,40 @@ if (isset($_POST['submit']) && wp_verify_nonce($_POST['_wpnonce'], 'speed_optimi
                 <tr>
                     <th scope="row"><?php _e('Exclude Files', 'speed-optimizer'); ?></th>
                     <td>
-                        <textarea name="exclude_files" rows="4" class="large-text"><?php echo esc_textarea($settings['exclude_files']); ?></textarea>
+                        <textarea name="exclude_files" rows="4" class="large-text" placeholder="wp-includes/js/jquery/*&#10;wp-content/plugins/plugin-name/*"><?php echo esc_textarea($settings['exclude_files']); ?></textarea>
                         <p class="description"><?php _e('One file per line. Files to exclude from optimization (supports wildcards).', 'speed-optimizer'); ?></p>
+                    </td>
+                </tr>
+                
+                <?php if ($license->is_feature_available('advanced_cache_rules')): ?>
+                <tr>
+                    <th scope="row"><?php _e('Advanced Cache Rules', 'speed-optimizer'); ?></th>
+                    <td>
+                        <textarea name="advanced_cache_rules" rows="6" class="large-text" placeholder="# Skip cache for admin users&#10;if (is_admin()) return false;&#10;&#10;# Skip cache for specific URLs&#10;if (strpos($_SERVER['REQUEST_URI'], '/api/') !== false) return false;"><?php echo esc_textarea(get_option('speed_optimizer_advanced_cache_rules', '')); ?></textarea>
+                        <p class="description"><?php _e('Advanced PHP code to control cache behavior. Use with caution - improper code may break your site.', 'speed-optimizer'); ?></p>
+                    </td>
+                </tr>
+                <?php endif; ?>
+                
+                <tr>
+                    <th scope="row"><?php _e('Cloudflare Integration', 'speed-optimizer'); ?></th>
+                    <td>
+                        <label>
+                            <input type="checkbox" name="cloudflare_integration" value="1" <?php checked(get_option('speed_optimizer_cloudflare_integration', 0), 1); ?>>
+                            <?php _e('Enable Cloudflare compatibility mode', 'speed-optimizer'); ?>
+                        </label>
+                        <p class="description"><?php _e('Optimizes cache headers and purging for Cloudflare CDN.', 'speed-optimizer'); ?></p>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <th scope="row"><?php _e('Varnish Cache', 'speed-optimizer'); ?></th>
+                    <td>
+                        <label>
+                            <input type="checkbox" name="varnish_cache" value="1" <?php checked(get_option('speed_optimizer_varnish_cache', 0), 1); ?>>
+                            <?php _e('Enable Varnish cache compatibility', 'speed-optimizer'); ?>
+                        </label>
+                        <p class="description"><?php _e('Adds appropriate headers for Varnish cache servers.', 'speed-optimizer'); ?></p>
                     </td>
                 </tr>
             </table>
@@ -697,6 +729,28 @@ if (isset($_POST['submit']) && wp_verify_nonce($_POST['_wpnonce'], 'speed_optimi
                             <?php _e('Clear All Cache', 'speed-optimizer'); ?>
                         </button>
                         <p class="description"><?php _e('Clear all cached files and force regeneration.', 'speed-optimizer'); ?></p>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <th scope="row"><?php _e('Safe Mode', 'speed-optimizer'); ?></th>
+                    <td>
+                        <label>
+                            <input type="checkbox" name="safe_mode" value="1" <?php checked(get_option('speed_optimizer_safe_mode', 0), 1); ?>>
+                            <?php _e('Enable safe mode (disables all optimizations)', 'speed-optimizer'); ?>
+                        </label>
+                        <p class="description"><?php _e('Temporarily disable all optimizations for troubleshooting.', 'speed-optimizer'); ?></p>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <th scope="row"><?php _e('Debug Mode', 'speed-optimizer'); ?></th>
+                    <td>
+                        <label>
+                            <input type="checkbox" name="debug_mode" value="1" <?php checked(get_option('speed_optimizer_debug_mode', 0), 1); ?>>
+                            <?php _e('Enable debug mode (adds performance comments to HTML)', 'speed-optimizer'); ?>
+                        </label>
+                        <p class="description"><?php _e('Adds HTML comments showing optimization details for debugging.', 'speed-optimizer'); ?></p>
                     </td>
                 </tr>
             </table>

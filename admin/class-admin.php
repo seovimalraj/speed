@@ -65,6 +65,10 @@ class Speed_Optimizer_Admin {
         
         // Advanced settings
         register_setting('speed_optimizer_settings', 'speed_optimizer_advanced_cache_rules');
+        register_setting('speed_optimizer_settings', 'speed_optimizer_cloudflare_integration');
+        register_setting('speed_optimizer_settings', 'speed_optimizer_varnish_cache');
+        register_setting('speed_optimizer_settings', 'speed_optimizer_safe_mode');
+        register_setting('speed_optimizer_settings', 'speed_optimizer_debug_mode');
     }
     
     /**
@@ -135,7 +139,11 @@ class Speed_Optimizer_Admin {
             'preconnect_domains' => get_option('speed_optimizer_preconnect_domains', ''),
             
             // Advanced settings
-            'advanced_cache_rules' => get_option('speed_optimizer_advanced_cache_rules', '')
+            'advanced_cache_rules' => get_option('speed_optimizer_advanced_cache_rules', ''),
+            'cloudflare_integration' => get_option('speed_optimizer_cloudflare_integration', 0),
+            'varnish_cache' => get_option('speed_optimizer_varnish_cache', 0),
+            'safe_mode' => get_option('speed_optimizer_safe_mode', 0),
+            'debug_mode' => get_option('speed_optimizer_debug_mode', 0)
         );
     }
     
