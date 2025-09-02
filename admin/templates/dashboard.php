@@ -9,10 +9,48 @@ $dashboard_data = $admin->get_dashboard_data();
 $stats = $dashboard_data['stats'];
 $recent_tests = $dashboard_data['recent_tests'];
 $recent_logs = $dashboard_data['recent_logs'];
+$license = new Speed_Optimizer_License();
+$current_tier = $license->get_license_tier();
+$license_info = $license->get_license_info();
 ?>
 
 <div class="wrap speed-optimizer-dashboard">
     <h1><?php _e('Speed Optimizer Dashboard', 'speed-optimizer'); ?></h1>
+    
+    <!-- License Status -->
+    <div class="license-status-card">
+        <div class="license-status-content">
+            <div class="license-tier">
+                <span class="tier-badge tier-<?php echo esc_attr($current_tier); ?>">
+                    <?php echo esc_html($license->get_tier_display_name($current_tier)); ?>
+                </span>
+            </div>
+            <div class="license-actions">
+                <?php if ($current_tier === Speed_Optimizer_License::TIER_FREE): ?>
+                    <a href="<?php echo admin_url('admin.php?page=speed-optimizer-upgrade'); ?>" 
+                       class="button button-primary">
+                        <?php _e('Upgrade Now', 'speed-optimizer'); ?>
+                    </a>
+                    <a href="<?php echo admin_url('admin.php?page=speed-optimizer-license'); ?>" 
+                       class="button button-secondary">
+                        <?php _e('Enter License', 'speed-optimizer'); ?>
+                    </a>
+                <?php else: ?>
+                    <span class="license-valid">
+                        <?php if (!empty($license_info['expires'])): ?>
+                            <?php printf(__('Valid until %s', 'speed-optimizer'), date('M j, Y', strtotime($license_info['expires']))); ?>
+                        <?php else: ?>
+                            <?php _e('License Active', 'speed-optimizer'); ?>
+                        <?php endif; ?>
+                    </span>
+                    <a href="<?php echo admin_url('admin.php?page=speed-optimizer-license'); ?>" 
+                       class="button button-secondary">
+                        <?php _e('Manage License', 'speed-optimizer'); ?>
+                    </a>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
     
     <?php if (!$dashboard_data['has_api_key']): ?>
     <div class="notice notice-warning">
@@ -163,4 +201,75 @@ $recent_logs = $dashboard_data['recent_logs'];
             </div>
         </div>
     </div>
+</div>
+
+<style>
+.license-status-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.license-status-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tier-badge {
+    background: rgba(255,255,255,0.2);
+    padding: 8px 20px;
+    border-radius: 25px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.tier-badge.tier-free {
+    background: rgba(255,255,255,0.3);
+}
+
+.tier-badge.tier-premium {
+    background: rgba(0,123,255,0.3);
+}
+
+.tier-badge.tier-business {
+    background: rgba(40,167,69,0.3);
+}
+
+.tier-badge.tier-agency {
+    background: rgba(220,53,69,0.3);
+}
+
+.license-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.license-actions .button {
+    border: 2px solid rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.1);
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.license-actions .button:hover {
+    background: rgba(255,255,255,0.2);
+    border-color: rgba(255,255,255,0.5);
+}
+
+.license-actions .button-primary {
+    background: rgba(255,255,255,0.2);
+    border-color: rgba(255,255,255,0.5);
+}
+
+.license-valid {
+    color: rgba(255,255,255,0.9);
+    font-size: 14px;
+    margin-right: 10px;
+}
+</style>
 </div>
