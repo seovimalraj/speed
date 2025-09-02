@@ -94,6 +94,12 @@ WordPress speed optimization plugin with PageSpeed Insights integration and pers
 - Exclude problematic files in Advanced settings
 - Clear cache after making changes
 
+### PageSpeed Test Timeouts
+- If you see "RPC::DEADLINE_EXCEEDED: context deadline exceeded" errors, this usually indicates the website being tested is very slow or Google's servers are busy
+- The plugin now automatically retries failed tests with exponential backoff
+- Tests have increased timeouts (up to 3 minutes) to handle slow websites
+- If tests consistently fail, try testing during off-peak hours or check if the website URL is accessible
+
 ### Compatibility
 - Test optimizations on staging environment first
 - Some themes/plugins may conflict with aggressive optimization
