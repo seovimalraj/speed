@@ -87,6 +87,7 @@ class Speed_Optimizer_License {
             'basic_lazy_loading' => array(self::TIER_FREE, self::TIER_PREMIUM, self::TIER_BUSINESS, self::TIER_AGENCY),
             'simple_database_cleanup' => array(self::TIER_FREE, self::TIER_PREMIUM, self::TIER_BUSINESS, self::TIER_AGENCY),
             'basic_dashboard' => array(self::TIER_FREE, self::TIER_PREMIUM, self::TIER_BUSINESS, self::TIER_AGENCY),
+            'page_caching' => array(self::TIER_FREE, self::TIER_PREMIUM, self::TIER_BUSINESS, self::TIER_AGENCY),
             
             // Premium features
             'advanced_caching' => array(self::TIER_PREMIUM, self::TIER_BUSINESS, self::TIER_AGENCY),
@@ -101,10 +102,26 @@ class Speed_Optimizer_License {
             'advanced_analytics' => array(self::TIER_PREMIUM, self::TIER_BUSINESS, self::TIER_AGENCY),
             'priority_support' => array(self::TIER_PREMIUM, self::TIER_BUSINESS, self::TIER_AGENCY),
             
+            // New Premium features
+            'cache_preloading' => array(self::TIER_PREMIUM, self::TIER_BUSINESS, self::TIER_AGENCY),
+            'file_concatenation' => array(self::TIER_PREMIUM, self::TIER_BUSINESS, self::TIER_AGENCY),
+            'remove_unused_css' => array(self::TIER_PREMIUM, self::TIER_BUSINESS, self::TIER_AGENCY),
+            'delay_js_execution' => array(self::TIER_PREMIUM, self::TIER_BUSINESS, self::TIER_AGENCY),
+            'defer_js_loading' => array(self::TIER_PREMIUM, self::TIER_BUSINESS, self::TIER_AGENCY),
+            'defer_css_loading' => array(self::TIER_PREMIUM, self::TIER_BUSINESS, self::TIER_AGENCY),
+            'inline_critical_css' => array(self::TIER_PREMIUM, self::TIER_BUSINESS, self::TIER_AGENCY),
+            'heartbeat_control' => array(self::TIER_PREMIUM, self::TIER_BUSINESS, self::TIER_AGENCY),
+            'preload_fonts' => array(self::TIER_PREMIUM, self::TIER_BUSINESS, self::TIER_AGENCY),
+            'cloudflare_integration' => array(self::TIER_PREMIUM, self::TIER_BUSINESS, self::TIER_AGENCY),
+            'varnish_cache' => array(self::TIER_PREMIUM, self::TIER_BUSINESS, self::TIER_AGENCY),
+            
             // Business features
             'multisite_support' => array(self::TIER_BUSINESS, self::TIER_AGENCY),
             'scheduled_optimization' => array(self::TIER_BUSINESS, self::TIER_AGENCY),
             'advanced_reporting' => array(self::TIER_BUSINESS, self::TIER_AGENCY),
+            'advanced_cache_rules' => array(self::TIER_BUSINESS, self::TIER_AGENCY),
+            'user_agent_cache' => array(self::TIER_BUSINESS, self::TIER_AGENCY),
+            'cache_logged_users' => array(self::TIER_BUSINESS, self::TIER_AGENCY),
             
             // Agency features
             'white_labeling' => array(self::TIER_AGENCY),
