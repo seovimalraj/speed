@@ -42,6 +42,7 @@ WordPress speed optimization plugin with PageSpeed Insights integration and pers
 2. **Configure Settings**: Go to Speed Optimizer > Settings and enter your API key
 3. **Run First Test**: Use the Speed Test page to analyze your website
 4. **Enable Optimizations**: Configure optimization settings based on your needs
+5. **Test Premium Features**: Use the test license keys provided in [TEST-LICENSE-KEYS.md](TEST-LICENSE-KEYS.md) to test premium functionality
 
 ## Configuration Options
 
@@ -97,6 +98,20 @@ WordPress speed optimization plugin with PageSpeed Insights integration and pers
 - Test optimizations on staging environment first
 - Some themes/plugins may conflict with aggressive optimization
 - Use exclude files option for compatibility
+
+## Testing Premium Features
+
+The plugin includes a demo/development mode that allows you to test premium features using test license keys. See [TEST-LICENSE-KEYS.md](TEST-LICENSE-KEYS.md) for available test license keys and instructions.
+
+### Available Test Tiers
+- **Premium**: Advanced caching, Critical CSS, WebP conversion
+- **Business**: Multisite support, Scheduled optimization  
+- **Agency**: White-labeling, Client management
+
+To test premium features:
+1. Go to Speed Optimizer → License in your WordPress admin
+2. Use one of the test license keys from [TEST-LICENSE-KEYS.md](TEST-LICENSE-KEYS.md)
+3. Activate the license to unlock premium features
 
 ## Support
 
