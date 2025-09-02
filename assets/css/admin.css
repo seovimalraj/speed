@@ -463,3 +463,35 @@
 .speed-optimizer-notice.warning {
     border-left-color: #ffb900;
 }
+
+/* Error handling styles */
+.result-card.error {
+    border: 1px solid #dc3232;
+    background-color: #fef7f7;
+}
+
+.result-card.error h4 {
+    color: #dc3232;
+}
+
+.error-message {
+    color: #dc3232;
+    padding: 10px;
+    font-style: italic;
+    text-align: center;
+}
+
+.no-results-message {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 4px;
+    padding: 15px;
+    margin: 20px 0;
+    color: #856404;
+    text-align: center;
+}
+
+.no-results-message p {
+    margin: 0;
+    font-style: italic;
+}
