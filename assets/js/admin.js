@@ -70,6 +70,7 @@
             $.ajax({
                 url: speedOptimizer.ajaxUrl,
                 type: 'POST',
+                timeout: 180000, // 3 minutes timeout to handle slow PageSpeed tests
                 data: {
                     action: 'speed_optimizer_test',
                     url: url,
@@ -79,8 +80,16 @@
                 success: function(response) {
                     SpeedOptimizer.displayTestResults(response);
                 },
-                error: function() {
-                    alert(speedOptimizer.strings.error);
+                error: function(xhr, status, error) {
+                    var errorMessage = speedOptimizer.strings.error;
+                    
+                    if (status === 'timeout') {
+                        errorMessage = 'The PageSpeed test took too long to complete. This can happen with very slow websites or when Google\'s servers are busy. Please try again later.';
+                    } else if (xhr.responseJSON && xhr.responseJSON.data) {
+                        errorMessage = xhr.responseJSON.data;
+                    }
+                    
+                    alert(errorMessage);
                 },
                 complete: function() {
                     $('#test-progress').hide();
@@ -96,29 +105,45 @@
             }
             
             var html = '<div class="test-result-grid">';
+            var hasResults = false;
             
             // Desktop results
             if (data.desktop) {
-                html += '<div class="result-card">';
-                html += '<h4>Desktop</h4>';
-                html += '<div class="score-display score-' + SpeedOptimizer.getScoreColor(data.desktop.score) + '">' + data.desktop.score + '</div>';
-                
-                if (data.desktop.metrics) {
-                    html += '<ul class="metrics-list">';
-                    for (var metric in data.desktop.metrics) {
-                        html += '<li><span>' + metric.toUpperCase() + '</span><span>' + data.desktop.metrics[metric] + '</span></li>';
+                if (data.desktop.error) {
+                    html += '<div class="result-card error">';
+                    html += '<h4>Desktop</h4>';
+                    html += '<div class="error-message">Error: ' + data.desktop.error + '</div>';
+                    html += '</div>';
+                } else {
+                    hasResults = true;
+                    html += '<div class="result-card">';
+                    html += '<h4>Desktop</h4>';
+                    html += '<div class="score-display score-' + SpeedOptimizer.getScoreColor(data.desktop.score) + '">' + data.desktop.score + '</div>';
+                    
+                    if (data.desktop.metrics) {
+                        html += '<ul class="metrics-list">';
+                        for (var metric in data.desktop.metrics) {
+                            html += '<li><span>' + metric.toUpperCase() + '</span><span>' + data.desktop.metrics[metric] + '</span></li>';
+                        }
+                        html += '</ul>';
                     }
-                    html += '</ul>';
+                    
+                    html += '</div>';
                 }
-                
-                html += '</div>';
             }
             
             // Mobile results
             if (data.mobile) {
-                html += '<div class="result-card">';
-                html += '<h4>Mobile</h4>';
-                html += '<div class="score-display score-' + SpeedOptimizer.getScoreColor(data.mobile.score) + '">' + data.mobile.score + '</div>';
+                if (data.mobile.error) {
+                    html += '<div class="result-card error">';
+                    html += '<h4>Mobile</h4>';
+                    html += '<div class="error-message">Error: ' + data.mobile.error + '</div>';
+                    html += '</div>';
+                } else {
+                    hasResults = true;
+                    html += '<div class="result-card">';
+                    html += '<h4>Mobile</h4>';
+                    html += '<div class="score-display score-' + SpeedOptimizer.getScoreColor(data.mobile.score) + '">' + data.mobile.score + '</div>';
                 
                 if (data.mobile.metrics) {
                     html += '<ul class="metrics-list">';
@@ -129,12 +154,20 @@
                 }
                 
                 html += '</div>';
+                }
             }
             
             html += '</div>';
             
-            // Opportunities
-            if (data.mobile && data.mobile.opportunities && data.mobile.opportunities.length > 0) {
+            // Show message if no results were obtained
+            if (!hasResults) {
+                html += '<div class="no-results-message">';
+                html += '<p>Unable to complete the PageSpeed test due to timeout issues. Please try again later or check if the website URL is accessible.</p>';
+                html += '</div>';
+            }
+            
+            // Opportunities (only if we have mobile results without errors)
+            if (data.mobile && !data.mobile.error && data.mobile.opportunities && data.mobile.opportunities.length > 0) {
                 html += '<div class="opportunities-section">';
                 html += '<h4>Optimization Opportunities</h4>';
                 html += '<div class="opportunities-list">';
