@@ -1,10 +1,10 @@
 <?php
 /**
- * Plugin Name: Speed Optimizer
- * Plugin URI: https://github.com/seovimalraj/speed
+ * Plugin Name: Speed Nav
+ * Plugin URI: https://narvab.com
  * Description: WordPress speed optimization plugin with PageSpeed Insights integration and personalized configuration options.
  * Version: 1.0.0
- * Author: Vimal Raj SEO
+ * Author: Vimal Raj
  * License: GPL v3 or later
  * License URI: https://www.gnu.org/licenses/gpl-3.0.html
  * Text Domain: speed-optimizer
