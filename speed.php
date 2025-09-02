@@ -73,6 +73,11 @@ class SpeedOptimizer {
         require_once SPEED_OPTIMIZER_PLUGIN_DIR . 'includes/class-database.php';
         require_once SPEED_OPTIMIZER_PLUGIN_DIR . 'includes/class-pagespeed-api.php';
         require_once SPEED_OPTIMIZER_PLUGIN_DIR . 'includes/class-optimizer.php';
+        require_once SPEED_OPTIMIZER_PLUGIN_DIR . 'includes/class-license.php';
+        require_once SPEED_OPTIMIZER_PLUGIN_DIR . 'includes/class-fastspring.php';
+        require_once SPEED_OPTIMIZER_PLUGIN_DIR . 'includes/class-premium.php';
+        require_once SPEED_OPTIMIZER_PLUGIN_DIR . 'includes/class-multisite.php';
+        require_once SPEED_OPTIMIZER_PLUGIN_DIR . 'includes/class-white-label.php';
         require_once SPEED_OPTIMIZER_PLUGIN_DIR . 'admin/class-admin.php';
     }
     
@@ -124,6 +129,37 @@ class SpeedOptimizer {
             'speed-optimizer-settings',
             array($this, 'settings_page')
         );
+        
+        add_submenu_page(
+            'speed-optimizer',
+            __('License', 'speed-optimizer'),
+            __('License', 'speed-optimizer'),
+            'manage_options',
+            'speed-optimizer-license',
+            array($this, 'license_page')
+        );
+        
+        add_submenu_page(
+            'speed-optimizer',
+            __('Upgrade', 'speed-optimizer'),
+            __('Upgrade', 'speed-optimizer'),
+            'manage_options',
+            'speed-optimizer-upgrade',
+            array($this, 'upgrade_page')
+        );
+        
+        // Add white-label menu for agency users
+        $license = new Speed_Optimizer_License();
+        if ($license->is_feature_available('white_labeling')) {
+            add_submenu_page(
+                'speed-optimizer',
+                __('White Label', 'speed-optimizer'),
+                __('White Label', 'speed-optimizer'),
+                'manage_options',
+                'speed-optimizer-white-label',
+                array($this, 'white_label_page')
+            );
+        }
     }
     
     /**
@@ -184,15 +220,46 @@ class SpeedOptimizer {
     }
     
     /**
+     * License page
+     */
+    public function license_page() {
+        require_once SPEED_OPTIMIZER_PLUGIN_DIR . 'admin/templates/license.php';
+    }
+    
+    /**
+     * Upgrade page
+     */
+    public function upgrade_page() {
+        require_once SPEED_OPTIMIZER_PLUGIN_DIR . 'admin/templates/upgrade.php';
+    }
+    
+    /**
+     * White label page
+     */
+    public function white_label_page() {
+        require_once SPEED_OPTIMIZER_PLUGIN_DIR . 'admin/templates/white-label.php';
+    }
+    
+    /**
      * Plugin activation
      */
     public function activate() {
         // Create database tables
         $database = new Speed_Optimizer_Database();
         $database->create_tables();
+        Speed_Optimizer_FastSpring::create_license_table();
         
         // Set default options
         $this->set_default_options();
+        
+        // Initialize premium features
+        new Speed_Optimizer_Premium();
+        
+        // Initialize multisite support
+        new Speed_Optimizer_Multisite();
+        
+        // Initialize white labeling
+        new Speed_Optimizer_White_Label();
         
         // Flush rewrite rules
         flush_rewrite_rules();
@@ -242,6 +309,14 @@ add_action('wp_ajax_speed_optimizer_test_api_key', 'speed_optimizer_ajax_test_ap
 add_action('wp_ajax_speed_optimizer_export_settings', 'speed_optimizer_ajax_export_settings');
 add_action('wp_ajax_speed_optimizer_import_settings', 'speed_optimizer_ajax_import_settings');
 add_action('wp_ajax_speed_optimizer_get_test_details', 'speed_optimizer_ajax_get_test_details');
+
+// License and premium AJAX handlers
+add_action('wp_ajax_speed_optimizer_activate_license', 'speed_optimizer_ajax_activate_license');
+add_action('wp_ajax_speed_optimizer_deactivate_license', 'speed_optimizer_ajax_deactivate_license');
+add_action('wp_ajax_speed_optimizer_check_license', 'speed_optimizer_ajax_check_license');
+add_action('wp_ajax_speed_optimizer_create_checkout', 'speed_optimizer_ajax_create_checkout');
+add_action('wp_ajax_speed_optimizer_generate_critical_css', 'speed_optimizer_ajax_generate_critical_css');
+add_action('wp_ajax_speed_optimizer_clear_fragment_cache', 'speed_optimizer_ajax_clear_fragment_cache');
 
 /**
  * AJAX handler for speed test

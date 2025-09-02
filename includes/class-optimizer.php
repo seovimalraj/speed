@@ -11,8 +11,10 @@ if (!defined('ABSPATH')) {
 class Speed_Optimizer_Optimizer {
     
     private $options;
+    private $license;
     
     public function __construct() {
+        $this->license = new Speed_Optimizer_License();
         $this->load_options();
         $this->init_hooks();
     }
@@ -38,23 +40,25 @@ class Speed_Optimizer_Optimizer {
      * Initialize WordPress hooks
      */
     private function init_hooks() {
-        if ($this->options['enable_minification']) {
+        // Basic features available to all tiers
+        if ($this->options['enable_minification'] && $this->license->is_feature_available('basic_minification')) {
             add_action('wp_enqueue_scripts', array($this, 'minify_scripts'), 999);
         }
         
-        if ($this->options['enable_compression']) {
+        if ($this->options['enable_compression'] && $this->license->is_feature_available('gzip_compression')) {
             add_action('init', array($this, 'enable_gzip_compression'));
         }
         
-        if ($this->options['enable_caching']) {
+        if ($this->options['enable_caching'] && $this->license->is_feature_available('basic_caching')) {
             add_action('init', array($this, 'setup_caching'));
         }
         
-        if ($this->options['enable_image_optimization']) {
+        if ($this->options['enable_image_optimization'] && $this->license->is_feature_available('basic_lazy_loading')) {
             add_filter('wp_get_attachment_image_src', array($this, 'optimize_image_src'), 10, 4);
         }
         
-        if (!empty($this->options['cdn_url'])) {
+        // Premium CDN feature
+        if (!empty($this->options['cdn_url']) && $this->license->is_feature_available('cdn_integration')) {
             add_filter('wp_get_attachment_url', array($this, 'replace_with_cdn'));
         }
         
@@ -351,6 +355,11 @@ class Speed_Optimizer_Optimizer {
      * Database optimization
      */
     public function optimize_database() {
+        // Check if feature is available based on license
+        if (!$this->license->is_feature_available('simple_database_cleanup')) {
+            return array('error' => 'Database optimization requires a premium license');
+        }
+        
         global $wpdb;
         
         $optimized = array();
@@ -371,28 +380,30 @@ class Speed_Optimizer_Optimizer {
         ");
         $optimized['postmeta'] = $postmeta_deleted;
         
-        // Clean spam comments
-        $spam_deleted = $wpdb->query("
-            DELETE FROM {$wpdb->comments} 
-            WHERE comment_approved = 'spam'
-        ");
-        $optimized['spam_comments'] = $spam_deleted;
+        // Clean spam comments (only for premium users)
+        if ($this->license->is_feature_available('advanced_caching')) {
+            $spam_deleted = $wpdb->query("
+                DELETE FROM {$wpdb->comments} 
+                WHERE comment_approved = 'spam'
+            ");
+            $optimized['spam_comments'] = $spam_deleted;
         
-        // Optimize database tables
-        $tables = $wpdb->get_results("SHOW TABLES", ARRAY_N);
-        $optimized_tables = 0;
-        foreach ($tables as $table) {
-            $wpdb->query("OPTIMIZE TABLE {$table[0]}");
-            $optimized_tables++;
+            // Optimize database tables
+            $tables = $wpdb->get_results("SHOW TABLES", ARRAY_N);
+            $optimized_tables = 0;
+            foreach ($tables as $table) {
+                $wpdb->query("OPTIMIZE TABLE {$table[0]}");
+                $optimized_tables++;
+            }
+            $optimized['tables'] = $optimized_tables;
         }
-        $optimized['tables'] = $optimized_tables;
         
         // Log the optimization
         $database = new Speed_Optimizer_Database();
         $database->log_action(
             'database_optimization',
-            sprintf('Cleaned %d transients, %d orphaned postmeta, %d spam comments, optimized %d tables',
-                $transients_deleted, $postmeta_deleted, $spam_deleted, $optimized_tables
+            sprintf('Cleaned %d transients, %d orphaned postmeta',
+                $transients_deleted, $postmeta_deleted
             )
         );
         
