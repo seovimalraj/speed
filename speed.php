@@ -76,6 +76,8 @@ class SpeedOptimizer {
         require_once SPEED_OPTIMIZER_PLUGIN_DIR . 'includes/class-license.php';
         require_once SPEED_OPTIMIZER_PLUGIN_DIR . 'includes/class-fastspring.php';
         require_once SPEED_OPTIMIZER_PLUGIN_DIR . 'includes/class-premium.php';
+        require_once SPEED_OPTIMIZER_PLUGIN_DIR . 'includes/class-multisite.php';
+        require_once SPEED_OPTIMIZER_PLUGIN_DIR . 'includes/class-white-label.php';
         require_once SPEED_OPTIMIZER_PLUGIN_DIR . 'admin/class-admin.php';
     }
     
@@ -145,6 +147,19 @@ class SpeedOptimizer {
             'speed-optimizer-upgrade',
             array($this, 'upgrade_page')
         );
+        
+        // Add white-label menu for agency users
+        $license = new Speed_Optimizer_License();
+        if ($license->is_feature_available('white_labeling')) {
+            add_submenu_page(
+                'speed-optimizer',
+                __('White Label', 'speed-optimizer'),
+                __('White Label', 'speed-optimizer'),
+                'manage_options',
+                'speed-optimizer-white-label',
+                array($this, 'white_label_page')
+            );
+        }
     }
     
     /**
@@ -219,6 +234,13 @@ class SpeedOptimizer {
     }
     
     /**
+     * White label page
+     */
+    public function white_label_page() {
+        require_once SPEED_OPTIMIZER_PLUGIN_DIR . 'admin/templates/white-label.php';
+    }
+    
+    /**
      * Plugin activation
      */
     public function activate() {
@@ -232,6 +254,12 @@ class SpeedOptimizer {
         
         // Initialize premium features
         new Speed_Optimizer_Premium();
+        
+        // Initialize multisite support
+        new Speed_Optimizer_Multisite();
+        
+        // Initialize white labeling
+        new Speed_Optimizer_White_Label();
         
         // Flush rewrite rules
         flush_rewrite_rules();
