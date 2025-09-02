@@ -19,6 +19,7 @@ class Speed_Optimizer_Admin {
      * Initialize settings
      */
     public function init_settings() {
+        // Basic settings
         register_setting('speed_optimizer_settings', 'speed_optimizer_enable_caching');
         register_setting('speed_optimizer_settings', 'speed_optimizer_enable_minification');
         register_setting('speed_optimizer_settings', 'speed_optimizer_enable_compression');
@@ -29,6 +30,41 @@ class Speed_Optimizer_Admin {
         register_setting('speed_optimizer_settings', 'speed_optimizer_cdn_url');
         register_setting('speed_optimizer_settings', 'speed_optimizer_exclude_files');
         register_setting('speed_optimizer_settings', 'speed_optimizer_cache_expiration');
+        
+        // New caching settings
+        register_setting('speed_optimizer_settings', 'speed_optimizer_enable_page_caching');
+        register_setting('speed_optimizer_settings', 'speed_optimizer_enable_cache_preloading');
+        register_setting('speed_optimizer_settings', 'speed_optimizer_enable_mobile_cache');
+        register_setting('speed_optimizer_settings', 'speed_optimizer_cache_logged_users');
+        register_setting('speed_optimizer_settings', 'speed_optimizer_cache_query_strings');
+        register_setting('speed_optimizer_settings', 'speed_optimizer_user_agent_cache');
+        
+        // File optimization settings
+        register_setting('speed_optimizer_settings', 'speed_optimizer_enable_concatenation');
+        register_setting('speed_optimizer_settings', 'speed_optimizer_remove_unused_css');
+        register_setting('speed_optimizer_settings', 'speed_optimizer_delay_js_execution');
+        register_setting('speed_optimizer_settings', 'speed_optimizer_defer_js_loading');
+        register_setting('speed_optimizer_settings', 'speed_optimizer_inline_critical_css');
+        
+        // Media optimization settings
+        register_setting('speed_optimizer_settings', 'speed_optimizer_webp_conversion');
+        register_setting('speed_optimizer_settings', 'speed_optimizer_add_image_dimensions');
+        register_setting('speed_optimizer_settings', 'speed_optimizer_disable_emoji_script');
+        
+        // eCommerce settings
+        register_setting('speed_optimizer_settings', 'speed_optimizer_woocommerce_optimization');
+        register_setting('speed_optimizer_settings', 'speed_optimizer_exclude_cart_checkout');
+        register_setting('speed_optimizer_settings', 'speed_optimizer_refresh_cart_fragments');
+        
+        // Tools and utilities settings
+        register_setting('speed_optimizer_settings', 'speed_optimizer_heartbeat_control');
+        register_setting('speed_optimizer_settings', 'speed_optimizer_heartbeat_frequency');
+        register_setting('speed_optimizer_settings', 'speed_optimizer_preload_links');
+        register_setting('speed_optimizer_settings', 'speed_optimizer_preload_fonts');
+        register_setting('speed_optimizer_settings', 'speed_optimizer_preconnect_domains');
+        
+        // Advanced settings
+        register_setting('speed_optimizer_settings', 'speed_optimizer_advanced_cache_rules');
     }
     
     /**
@@ -54,6 +90,7 @@ class Speed_Optimizer_Admin {
      */
     public function get_settings() {
         return array(
+            // Basic settings
             'enable_caching' => get_option('speed_optimizer_enable_caching', 1),
             'enable_minification' => get_option('speed_optimizer_enable_minification', 1),
             'enable_compression' => get_option('speed_optimizer_enable_compression', 1),
@@ -63,7 +100,42 @@ class Speed_Optimizer_Admin {
             'optimization_level' => get_option('speed_optimizer_optimization_level', 'moderate'),
             'cdn_url' => get_option('speed_optimizer_cdn_url', ''),
             'exclude_files' => get_option('speed_optimizer_exclude_files', ''),
-            'cache_expiration' => get_option('speed_optimizer_cache_expiration', 86400)
+            'cache_expiration' => get_option('speed_optimizer_cache_expiration', 86400),
+            
+            // New caching settings
+            'enable_page_caching' => get_option('speed_optimizer_enable_page_caching', 1),
+            'enable_cache_preloading' => get_option('speed_optimizer_enable_cache_preloading', 0),
+            'enable_mobile_cache' => get_option('speed_optimizer_enable_mobile_cache', 1),
+            'cache_logged_users' => get_option('speed_optimizer_cache_logged_users', 0),
+            'cache_query_strings' => get_option('speed_optimizer_cache_query_strings', 0),
+            'user_agent_cache' => get_option('speed_optimizer_user_agent_cache', 0),
+            
+            // File optimization settings
+            'enable_concatenation' => get_option('speed_optimizer_enable_concatenation', 0),
+            'remove_unused_css' => get_option('speed_optimizer_remove_unused_css', 0),
+            'delay_js_execution' => get_option('speed_optimizer_delay_js_execution', 0),
+            'defer_js_loading' => get_option('speed_optimizer_defer_js_loading', 0),
+            'inline_critical_css' => get_option('speed_optimizer_inline_critical_css', 0),
+            
+            // Media optimization settings
+            'webp_conversion' => get_option('speed_optimizer_webp_conversion', 0),
+            'add_image_dimensions' => get_option('speed_optimizer_add_image_dimensions', 1),
+            'disable_emoji_script' => get_option('speed_optimizer_disable_emoji_script', 1),
+            
+            // eCommerce settings
+            'woocommerce_optimization' => get_option('speed_optimizer_woocommerce_optimization', 1),
+            'exclude_cart_checkout' => get_option('speed_optimizer_exclude_cart_checkout', 1),
+            'refresh_cart_fragments' => get_option('speed_optimizer_refresh_cart_fragments', 1),
+            
+            // Tools and utilities settings
+            'heartbeat_control' => get_option('speed_optimizer_heartbeat_control', 0),
+            'heartbeat_frequency' => get_option('speed_optimizer_heartbeat_frequency', 60),
+            'preload_links' => get_option('speed_optimizer_preload_links', 0),
+            'preload_fonts' => get_option('speed_optimizer_preload_fonts', 0),
+            'preconnect_domains' => get_option('speed_optimizer_preconnect_domains', ''),
+            
+            // Advanced settings
+            'advanced_cache_rules' => get_option('speed_optimizer_advanced_cache_rules', '')
         );
     }
     
@@ -91,20 +163,8 @@ class Speed_Optimizer_Admin {
      * Clear cache
      */
     public function clear_cache() {
-        $cache_dir = WP_CONTENT_DIR . '/cache/speed-optimizer/';
-        if (is_dir($cache_dir)) {
-            $this->delete_directory($cache_dir);
-        }
-        
-        // Clear WordPress object cache
-        if (function_exists('wp_cache_flush')) {
-            wp_cache_flush();
-        }
-        
-        $database = new Speed_Optimizer_Database();
-        $database->log_action('cache_cleared', 'All cache files cleared');
-        
-        return true;
+        $optimizer = new Speed_Optimizer_Optimizer();
+        return $optimizer->clear_all_caches();
     }
     
     /**
